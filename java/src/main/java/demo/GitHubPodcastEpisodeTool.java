@@ -53,18 +53,26 @@ public final class GitHubPodcastEpisodeTool {
         return episodes.get(ModelSelector.readIndex("Episode [1]: ", episodes.size(), 0));
     }
 
-    private static String getLatestJson() throws Exception {
-        return latest().toString();
+    private static String getLatestJson() {
+        try {
+            return latest().toString();
+        } catch (Exception exception) {
+            throw new IllegalStateException("Failed to read The GitHub Podcast RSS feed.", exception);
+        }
     }
 
-    private static String getEpisodeJson(String episodeTitle) throws Exception {
-        for (var item : items()) {
-            var episode = toEpisodeBrief(item);
-            if (episodeTitle == null || episodeTitle.isBlank() || episodeTitle.equalsIgnoreCase(episode.title())) {
-                return episode.toString();
+    private static String getEpisodeJson(String episodeTitle) {
+        try {
+            for (var item : items()) {
+                var episode = toEpisodeBrief(item);
+                if (episodeTitle == null || episodeTitle.isBlank() || episodeTitle.equalsIgnoreCase(episode.title())) {
+                    return episode.toString();
+                }
             }
+            throw new IllegalArgumentException("Episode \"" + episodeTitle + "\" was not found in the GitHub Podcast RSS feed.");
+        } catch (Exception exception) {
+            throw new IllegalStateException("Failed to read The GitHub Podcast RSS feed.", exception);
         }
-        throw new IllegalArgumentException("Episode \"" + episodeTitle + "\" was not found in the GitHub Podcast RSS feed.");
     }
 
     private static List<org.w3c.dom.Element> items() throws Exception {
