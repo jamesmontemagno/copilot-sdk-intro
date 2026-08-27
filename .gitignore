@@ -1,0 +1,31 @@
+# .NET build outputs
+bin/
+obj/
+out/
+
+# Node.js
+node_modules/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Go
+*.exe
+
+# Java
+target/
+
+# Rust
+target/
+.cargo-target/
+
+# Editors and OS files
+.vscode/
+*.code-workspace
+.DS_Store
+Thumbs.db
+
+# Copilot/runtime artifacts
+.playwright-mcp/
