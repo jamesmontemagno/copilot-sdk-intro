@@ -31,6 +31,7 @@ python main.py
 - Streaming session events
 - Pydantic-typed local tools
 - Host-controlled tool approval
+- A replacement system message that defines the session's complete agent identity
 - Model and live episode selection
 - Responses grounded in current RSS data
 

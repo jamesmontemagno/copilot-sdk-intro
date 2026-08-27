@@ -29,6 +29,7 @@ cargo run --locked
 - Streaming session events
 - Schema-derived typed local tools
 - Explicit tool permission boundaries
+- A replacement system message that defines the session's complete agent identity
 - Model and live episode selection
 - Responses grounded in current RSS data
 

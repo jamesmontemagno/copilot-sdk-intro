@@ -126,6 +126,8 @@ const session = await client.createSession({
 
 Say: "The model does not get arbitrary access to my application. I grant two narrow, typed capabilities and remain the approval point before a tool executes."
 
+Say: "The system message uses replace, not append. My application supplies the complete agent identity and grounding rule for this session instead of inheriting the default prompt."
+
 ### 3. Replace The Prompt
 
 Replace the prompt with:

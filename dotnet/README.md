@@ -44,6 +44,7 @@ dotnet run --project dotnet
 - A minimal Hello World prompt and response.
 - `CopilotTool.DefineTool` to expose a host-owned .NET capability.
 - A host-controlled approval prompt before the tool executes.
+- A replacement system message that defines the session's complete agent identity.
 - Tool output grounded in a public, current RSS source.
 
 The expanded demo asks the presenter to choose a model and one of the ten latest episodes. Follow [LIVE_DEMO.md](LIVE_DEMO.md) for the complete presenter typing script and talk track.

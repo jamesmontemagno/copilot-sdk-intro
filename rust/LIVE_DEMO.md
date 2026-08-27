@@ -17,7 +17,7 @@ Start with `src\main.rs`. It deliberately has named placeholders for `client`, `
 Add this import:
 
 ```rust
-use github_copilot_sdk::types::MessageOptions;
+use github_copilot_sdk::types::{MessageOptions, SystemMessageConfig};
 ```
 
 ### 1. Start The Client
@@ -117,10 +117,19 @@ config.available_tools = Some(vec![
     "get_github_podcast_episode".to_owned(),
     "get_latest_github_podcast_episodes".to_owned(),
 ]);
+config = config.with_system_message(
+    SystemMessageConfig::new()
+        .with_mode("replace")
+        .with_content(
+            "You are the launch assistant for The GitHub Podcast. Use supplied episode facts only.",
+        ),
+);
 let session = client.create_session(config).await?;
 ```
 
 Say: "The model gets two narrow, typed application capabilities. Add a `PermissionHandler` with `with_permission_handler` when the host must prompt for each tool call."
+
+Say: "The system message uses replace, not append. My application supplies the complete agent identity and grounding rule for this session instead of inheriting the default prompt."
 
 ### 3. Replace The Prompt
 

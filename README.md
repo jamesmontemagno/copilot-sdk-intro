@@ -18,3 +18,9 @@ Authenticate first if needed:
 ```powershell
 copilot auth login
 ```
+
+## References
+
+- [GitHub Copilot SDK source and language APIs](https://github.com/github/copilot-sdk)
+- [Copilot SDK workshop](https://github.com/jamesmontemagno/copilot-sdk-workshop)
+- [The GitHub Podcast RSS feed](https://feeds.simplecast.com/ioCY0vfY)

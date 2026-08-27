@@ -29,6 +29,7 @@ go run .
 - Streaming session events
 - Typed local tools
 - Explicit tool permission policy
+- A replacement system message that defines the session's complete agent identity
 - Model and live episode selection
 - Responses grounded in current RSS data
 

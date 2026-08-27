@@ -110,6 +110,8 @@ SystemMessage = new SystemMessageConfig
 
 Say: "The model does not get arbitrary access to my application. I grant two narrow, typed capabilities and remain the approval point before a tool executes."
 
+Say: "The system message uses Replace, not Append. My application supplies the complete agent identity and grounding rule for this session instead of inheriting the default prompt."
+
 ### 3. Replace The Prompt
 
 Replace Hello World with the selected, grounded episode request:

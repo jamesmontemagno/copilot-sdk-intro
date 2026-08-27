@@ -116,6 +116,8 @@ var session = client.createSession(new SessionConfig()
 
 Say: "The model gets two narrow, typed application capabilities. This Java sample uses the SDK's approve-all handler for those known local tools; replace it with a custom handler when the host must prompt for each call."
 
+Say: "The system message uses REPLACE, not APPEND. My application supplies the complete agent identity and grounding rule for this session instead of inheriting the default prompt."
+
 ### 3. Replace The Prompt
 
 Replace the prompt:

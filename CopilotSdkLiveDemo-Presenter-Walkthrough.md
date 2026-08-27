@@ -235,6 +235,10 @@ Say:
 
 > The model does not get arbitrary access to my application. I grant two typed capabilities, and my host app remains the approval point before a tool executes.
 
+Say:
+
+> The system message uses Replace, not Append. My application supplies the complete agent identity and grounding rule for this session instead of inheriting the default prompt.
+
 ### Step 5: Replace the prompt with a grounded request
 
 Replace the hello-world prompt with:
