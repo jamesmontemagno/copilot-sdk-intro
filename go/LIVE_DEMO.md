@@ -1,18 +1,22 @@
-# Copilot SDK Live Demo: Go
+# The GitHub Podcast Live Demo: Go
 
-Run from the repository root:
+## Before The Session
+
+1. Run `copilot auth login` if this machine is not already authenticated.
+2. Download dependencies from the repository root:
 
 ```powershell
 cd go
 go mod tidy
-go run .
 ```
 
 ## Act One: Hello World
 
-Open `main.go`.
+Start with `main.go`. It deliberately has named placeholders for `client`, `isAuthenticated`, and `session`. Leave the event handler in place.
 
-1. Replace the client placeholder with:
+### 1. Start The Client
+
+Replace the client placeholder with:
 
 ```go
 client := copilot.NewClient(&copilot.ClientOptions{LogLevel: "error"})
@@ -22,15 +26,25 @@ if err := client.Start(context.Background()); err != nil {
 defer client.Stop()
 ```
 
-2. Replace `isAuthenticated := false` with:
+Say: "The client is my connection to the Copilot runtime. I start it explicitly, so the application owns its lifecycle."
+
+### 2. Check Authentication
+
+Replace `isAuthenticated := false` with:
 
 ```go
-isAuthenticated := true
+authStatus, err := client.GetAuthStatus(context.Background())
+if err != nil {
+	panic(err)
+}
+isAuthenticated := authStatus.IsAuthenticated
 ```
 
-Say: "The Go SDK starts against the signed-in Copilot runtime. If this machine is not signed in, run `copilot auth login`."
+Say: "Before creating a session, I can ask the runtime whether this machine is signed in."
 
-3. Replace the session placeholder with:
+### 3. Create The Session
+
+Replace the session placeholder with:
 
 ```go
 session, err := client.CreateSession(context.Background(), &copilot.SessionConfig{
@@ -43,7 +57,11 @@ if err != nil {
 defer session.Disconnect()
 ```
 
-4. Under `// Step 5: Send the first message.`, type:
+Say: "The session is the conversation. I chose the model, enabled streaming, and the event handler below prints each text fragment as it arrives."
+
+### 4. Send Hello World
+
+Under `// Step 5: Send the first message.`, type:
 
 ```go
 if err := streamResponse(session, "Hello world! In one sentence, say what the Copilot SDK helps a Go app do."); err != nil {
@@ -51,7 +69,21 @@ if err := streamResponse(session, "Hello world! In one sentence, say what the Co
 }
 ```
 
-## Act Two: Podcast Assistant
+Say: "That is the basic shape: start a client, create a session, listen for events, and send a message."
+
+Run:
+
+```powershell
+go run .
+```
+
+Expected output: a streamed one-sentence answer, followed by `SendAndWait` completing the turn.
+
+## Act Two: Turn It Into A Podcast Assistant
+
+After Hello World, use the prewritten helpers in `helpers.go` to turn the same session into a grounded podcast workflow.
+
+### 1. Let The Presenter Choose
 
 After starting the client:
 
@@ -69,6 +101,10 @@ if err != nil {
 	panic(err)
 }
 ```
+
+Say: "This keeps the demo live. I can choose a model in the room, then choose from the real ten newest GitHub Podcast episodes."
+
+### 2. Give The Session Capabilities
 
 Create the tools:
 
@@ -91,7 +127,15 @@ session, err := client.CreateSession(context.Background(), &copilot.SessionConfi
 		Content: "You are the launch assistant for The GitHub Podcast. Use supplied episode facts only.",
 	},
 })
+if err != nil {
+	panic(err)
+}
+defer session.Disconnect()
 ```
+
+Say: "The model gets two narrow, typed application capabilities. This Go sample uses the SDK's approve-all handler for those known local tools; replace it with a custom handler when the host must prompt for each call."
+
+### 3. Replace The Prompt
 
 Replace the prompt:
 
@@ -102,4 +146,12 @@ if err := streamResponse(session, prompt); err != nil {
 }
 ```
 
-Expected cues: model list, episode list, tool start, approval, tool completion, then streamed launch copy.
+Say: "The agent decides to call the episode tool, and its response is grounded in the official feed rather than invented details."
+
+Run the completed flow:
+
+```powershell
+go run .
+```
+
+Expected milestones: model selection, ten-episode selection, `[Tool call started]`, `[Tool call complete]`, then streamed launch copy.

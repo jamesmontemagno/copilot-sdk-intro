@@ -50,7 +50,7 @@ Say: "The session is the conversation. I chose the model, enabled streaming, and
 
 ### 4. Send Hello World
 
-Under `// Send the first message.`, type:
+Under `// Step 5: Send the first message.`, type:
 
 ```csharp
 await session.SendAsync(new MessageOptions
@@ -62,6 +62,12 @@ await session.SendAsync(new MessageOptions
 Say: "That is the basic shape: start a client, create a session, listen for events, and send a message."
 
 Expected output: a streamed one-sentence answer, followed by the existing `SessionIdleEvent` completing the program.
+
+Run:
+
+```powershell
+dotnet run --project dotnet
+```
 
 ## Act Two: Turn It Into A Podcast Assistant
 
@@ -118,3 +124,9 @@ await session.SendAsync(new MessageOptions
 Say: "The agent decides to call the episode tool, I approve the read-only lookup, and its response is grounded in the official feed rather than invented details."
 
 Expected milestones: model selection, ten-episode selection, `[Tool call started]`, approval prompt, `[Tool call complete]`, then streamed launch copy.
+
+Run the completed flow again:
+
+```powershell
+dotnet run --project dotnet
+```
