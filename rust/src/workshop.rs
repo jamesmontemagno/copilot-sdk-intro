@@ -5,31 +5,16 @@ use async_trait::async_trait;
 use github_copilot_sdk::tool::{ToolHandler, schema_for};
 use github_copilot_sdk::types::{Tool, ToolInvocation};
 use github_copilot_sdk::{Client, Error, ToolResult};
-use quick_xml::de::from_str;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 const FEED_URL: &str = "https://feeds.simplecast.com/ioCY0vfY";
 
-#[derive(Debug, Deserialize)]
-struct Rss {
-    channel: Channel,
-}
-
-#[derive(Debug, Deserialize)]
-struct Channel {
-    #[serde(rename = "item")]
-    items: Vec<Item>,
-}
-
-#[derive(Debug, Deserialize)]
 struct Item {
     title: Option<String>,
-    #[serde(rename = "pubDate")]
     published: Option<String>,
     description: Option<String>,
     link: Option<String>,
-    #[serde(rename = "duration")]
     duration: Option<String>,
 }
 
@@ -145,8 +130,19 @@ async fn get_items() -> Result<Vec<Item>, Error> {
         .text()
         .await
         .map_err(|error| std::io::Error::other(error.to_string()))?;
-    let rss: Rss = from_str(&xml).map_err(|error| std::io::Error::other(error.to_string()))?;
-    Ok(rss.channel.items)
+    let document = roxmltree::Document::parse(&xml)
+        .map_err(|error| std::io::Error::other(error.to_string()))?;
+    Ok(document
+        .descendants()
+        .filter(|node| node.has_tag_name("item"))
+        .map(|item| Item {
+            title: child_text(item, "title", None),
+            published: child_text(item, "pubDate", None),
+            description: child_text(item, "description", None),
+            link: child_text(item, "link", None),
+            duration: child_text(item, "duration", Some("http://www.itunes.com/dtds/podcast-1.0.dtd")),
+        })
+        .collect())
 }
 
 fn to_episode_brief(item: &Item) -> EpisodeBrief {
@@ -168,6 +164,15 @@ fn episode_number_from_title(item: &Item) -> Option<i32> {
         .0
         .parse::<i32>()
         .ok()
+}
+
+fn child_text(item: roxmltree::Node<'_, '_>, name: &str, namespace: Option<&str>) -> Option<String> {
+    item.children()
+        .find(|node| node.is_element() && node.tag_name().name() == name && node.tag_name().namespace() == namespace)
+        .and_then(|node| node.text())
+        .map(str::trim)
+        .filter(|value| !value.is_empty())
+        .map(str::to_owned)
 }
 
 fn strip_html(value: &str) -> String {

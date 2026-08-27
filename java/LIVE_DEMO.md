@@ -78,7 +78,8 @@ After Hello World, use the prewritten helper classes to turn the same session in
 
 ### 1. Let The Presenter Choose
 
-Add imports for `MessageOptions`, `PermissionHandler`, `SystemMessageConfig`, `SystemMessageMode`, and `List`.
+Add imports for `com.github.copilot.rpc.MessageOptions`, `com.github.copilot.rpc.PermissionHandler`,
+`com.github.copilot.rpc.SystemMessageConfig`, `com.github.copilot.SystemMessageMode`, and `java.util.List`.
 
 After the client starts:
 
