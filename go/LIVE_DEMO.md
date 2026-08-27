@@ -10,6 +10,12 @@ cd go
 go mod tidy
 ```
 
+## Demo Pitch
+
+Say: "We are building a Podcast Agent for The GitHub Podcast. It will let us choose a real episode, retrieve verified metadata from the official RSS feed, and turn those facts into sponsor-safe social copy."
+
+Say: "We will begin with the smallest possible Copilot SDK conversation, then give it a purpose, an identity, and application-owned tools."
+
 ## Act One: Hello World
 
 Start with `main.go`. It deliberately has named placeholders for `client`, `isAuthenticated`, and `session`. Leave the event handler in place.
@@ -69,9 +75,9 @@ if err := streamResponse(session, "Hello world! In one sentence, say what the Co
 }
 ```
 
-Say: "That is the basic shape: start a client, create a session, listen for events, and send a message."
+Say: "That is the basic shape: start a client, create a session, listen for events, and send a message. Once this loop works, we can evolve it into our Podcast Agent."
 
-Run:
+Run this Hello World checkpoint now from the `go` folder:
 
 ```powershell
 go run .
@@ -79,9 +85,11 @@ go run .
 
 Expected output: a streamed one-sentence answer, followed by `SendAndWait` completing the turn.
 
-## Act Two: Turn It Into A Podcast Assistant
+## Act Two: Turn It Into A Podcast Agent
 
 After Hello World, use the prewritten helpers in `helpers.go` to turn the same session into a grounded podcast workflow.
+
+Say: "The conversation works. Now we will turn it into our Podcast Agent: a focused assistant that can research a selected GitHub Podcast episode and prepare launch copy without inventing facts."
 
 ### 1. Let The Presenter Choose
 
@@ -102,7 +110,7 @@ if err != nil {
 }
 ```
 
-Say: "This keeps the demo live. I can choose a model in the room, then choose from the real ten newest GitHub Podcast episodes."
+Say: "This keeps the demo live. I can choose a model in the room, then choose from the real ten newest GitHub Podcast episodes. That selection becomes the Podcast Agent's assignment."
 
 ### 2. Give The Session Capabilities
 
@@ -135,6 +143,8 @@ defer session.Disconnect()
 
 Say: "The model gets two narrow, typed application capabilities. This Go sample uses the SDK's approve-all handler for those known local tools; replace it with a custom handler when the host must prompt for each call."
 
+Say: "These tools are what make this an agent rather than a generic chatbot: it can take action against a trusted data source that my application controls."
+
 Say: "The system message uses replace, not append. My application supplies the complete agent identity and grounding rule for this session instead of inheriting the default prompt."
 
 ### 3. Replace The Prompt
@@ -150,7 +160,7 @@ if err := streamResponse(session, prompt); err != nil {
 
 Say: "The agent decides to call the episode tool, and its response is grounded in the official feed rather than invented details."
 
-Run the completed flow:
+Run the completed Podcast Agent now from the `go` folder:
 
 ```powershell
 go run .

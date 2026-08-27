@@ -10,6 +10,12 @@ cd rust
 cargo check --locked
 ```
 
+## Demo Pitch
+
+Say: "We are building a Podcast Agent for The GitHub Podcast. It will let us choose a real episode, retrieve verified metadata from the official RSS feed, and turn those facts into sponsor-safe social copy."
+
+Say: "We will begin with the smallest possible Copilot SDK conversation, then give it a purpose, an identity, and application-owned tools."
+
 ## Act One: Hello World
 
 Start with `src\main.rs`. It deliberately has named placeholders for `client`, `is_authenticated`, and the session.
@@ -72,9 +78,9 @@ if let Some(event) = response {
 }
 ```
 
-Say: "That is the basic shape: start a client, create a session, subscribe to events, and send a message."
+Say: "That is the basic shape: start a client, create a session, subscribe to events, and send a message. Once this loop works, we can evolve it into our Podcast Agent."
 
-Run:
+Run this Hello World checkpoint now from the `rust` folder:
 
 ```powershell
 cargo run
@@ -82,9 +88,11 @@ cargo run
 
 Expected output: a one-sentence answer while the session emits its streaming events.
 
-## Act Two: Turn It Into A Podcast Assistant
+## Act Two: Turn It Into A Podcast Agent
 
 After Hello World, use the prewritten code in `src\workshop.rs` to turn the same session into a grounded podcast workflow.
+
+Say: "The conversation works. Now we will turn it into our Podcast Agent: a focused assistant that can research a selected GitHub Podcast episode and prepare launch copy without inventing facts."
 
 ### 1. Let The Presenter Choose
 
@@ -102,7 +110,7 @@ let latest_episodes = workshop::get_latest_episodes().await?;
 let selected_episode = workshop::pick_episode(&latest_episodes)?;
 ```
 
-Say: "This keeps the demo live. I can choose a model in the room, then choose from the real ten newest GitHub Podcast episodes."
+Say: "This keeps the demo live. I can choose a model in the room, then choose from the real ten newest GitHub Podcast episodes. That selection becomes the Podcast Agent's assignment."
 
 ### 2. Give The Session Capabilities
 
@@ -129,6 +137,8 @@ let session = client.create_session(config).await?;
 
 Say: "The model gets two narrow, typed application capabilities. Add a `PermissionHandler` with `with_permission_handler` when the host must prompt for each tool call."
 
+Say: "These tools are what make this an agent rather than a generic chatbot: it can take action against a trusted data source that my application controls."
+
 Say: "The system message uses replace, not append. My application supplies the complete agent identity and grounding rule for this session instead of inheriting the default prompt."
 
 ### 3. Replace The Prompt
@@ -151,7 +161,7 @@ if let Some(event) = response {
 
 Say: "The agent decides to call the episode tool, and its response is grounded in the official feed rather than invented details."
 
-Run the completed flow:
+Run the completed Podcast Agent now from the `rust` folder:
 
 ```powershell
 cargo run
