@@ -50,15 +50,15 @@ After the client starts:
 
 ```java
 String selectedModel = ModelSelector.select(client, MODEL);
-var latestEpisodes = MergeConflictEpisodeTool.latest();
-var selectedEpisode = MergeConflictEpisodeTool.pick(latestEpisodes);
+var latestEpisodes = GitHubPodcastEpisodeTool.latest();
+var selectedEpisode = GitHubPodcastEpisodeTool.pick(latestEpisodes);
 ```
 
 Create the tools:
 
 ```java
-var episodeTool = MergeConflictEpisodeTool.episodeTool();
-var latestEpisodesTool = MergeConflictEpisodeTool.latestEpisodesTool();
+var episodeTool = GitHubPodcastEpisodeTool.episodeTool();
+var latestEpisodesTool = GitHubPodcastEpisodeTool.latestEpisodesTool();
 ```
 
 Create the session:
@@ -68,7 +68,7 @@ var session = client.createSession(new SessionConfig()
         .setModel(selectedModel)
         .setStreaming(true)
         .setTools(List.of(episodeTool, latestEpisodesTool))
-        .setAvailableTools(List.of("get_merge_conflict_episode", "get_latest_merge_conflict_episodes"))
+        .setAvailableTools(List.of("get_github_podcast_episode", "get_latest_github_podcast_episodes"))
         .setOnPermissionRequest(PermissionHandler.APPROVE_ALL))
         .get();
 ```
@@ -79,7 +79,7 @@ Replace the prompt:
 
 ```java
 session.sendAndWait(new MessageOptions()
-        .setPrompt("Use get_merge_conflict_episode for episode " + selectedEpisode.episodeNumber()
+        .setPrompt("Use get_github_podcast_episode for the episode titled \"" + selectedEpisode.title() + "\""
                 + ". Return exactly a social headline and a sponsor-safe post under 280 characters. "
                 + "Use only facts returned by the tool; do not invent guests, sponsors, topics, or links."))
         .get();

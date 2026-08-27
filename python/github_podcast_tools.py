@@ -11,7 +11,7 @@ from pydantic import BaseModel, Field
 
 from model_selector import read_index
 
-FEED_URL = "https://feeds.fireside.fm/mergeconflict/rss"
+FEED_URL = "https://feeds.simplecast.com/ioCY0vfY"
 
 
 @dataclass(frozen=True)
@@ -26,25 +26,25 @@ class EpisodeBrief:
 
 
 class EpisodeParams(BaseModel):
-    episode_number: int | None = Field(
+    episode_title: str | None = Field(
         default=None,
-        description="Optional Merge Conflict episode number. Omit for the latest episode.",
+        description="Optional GitHub Podcast episode title. Omit for the latest episode.",
     )
 
 
 @define_tool(
-    name="get_merge_conflict_episode",
-    description="Gets a Merge Conflict episode from the official RSS feed.",
+    name="get_github_podcast_episode",
+    description="Gets a GitHub Podcast episode from the official RSS feed.",
 )
-def get_merge_conflict_episode(params: EpisodeParams) -> dict[str, object]:
-    return asdict(get_episode(params.episode_number))
+def get_github_podcast_episode(params: EpisodeParams) -> dict[str, object]:
+    return asdict(get_episode(params.episode_title))
 
 
 @define_tool(
-    name="get_latest_merge_conflict_episodes",
-    description="Gets the ten newest Merge Conflict episodes from the official RSS feed.",
+    name="get_latest_github_podcast_episodes",
+    description="Gets the ten newest GitHub Podcast episodes from the official RSS feed.",
 )
-def get_latest_merge_conflict_episodes() -> list[dict[str, object]]:
+def get_latest_github_podcast_episodes() -> list[dict[str, object]]:
     return [asdict(episode) for episode in get_latest()]
 
 
@@ -52,26 +52,26 @@ def get_latest() -> list[EpisodeBrief]:
     return [to_episode_brief(item) for item in get_items()[:10]]
 
 
-def get_episode(episode_number: int | None) -> EpisodeBrief:
+def get_episode(episode_title: str | None) -> EpisodeBrief:
     items = get_items()
-    item = items[0] if episode_number is None else next(
-        (candidate for candidate in items if get_episode_number(candidate) == episode_number),
+    item = items[0] if not episode_title else next(
+        (candidate for candidate in items if value(candidate, "title").lower() == episode_title.lower()),
         None,
     )
     if item is None:
         raise ValueError(
-            "The Merge Conflict RSS feed contained no episodes."
-            if episode_number is None
-            else f"Episode {episode_number} was not found in the Merge Conflict RSS feed."
+            "The GitHub Podcast RSS feed contained no episodes."
+            if not episode_title
+            else f'Episode "{episode_title}" was not found in the GitHub Podcast RSS feed.'
         )
     return to_episode_brief(item)
 
 
 def pick_episode(episodes: list[EpisodeBrief]) -> EpisodeBrief:
     if not episodes:
-        raise ValueError("No Merge Conflict episodes are available to select.")
+        raise ValueError("No GitHub Podcast episodes are available to select.")
 
-    print("\nChoose a Merge Conflict episode:")
+    print("\nChoose a GitHub Podcast episode:")
     for index, episode in enumerate(episodes, start=1):
         print(f"  {index}. {episode.title}")
     return episodes[read_index("Episode [1]: ", len(episodes), 0)]

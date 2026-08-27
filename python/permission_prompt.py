@@ -4,7 +4,7 @@ from copilot.rpc import PermissionDecisionApproveOnce, PermissionDecisionReject
 def permission_prompt(request, _invocation):
     if getattr(request, "kind", None) != "tool":
         return PermissionDecisionReject(
-            feedback="This demo only permits its Merge Conflict episode lookup tool."
+            feedback="This demo only permits its GitHub Podcast episode lookup tool."
         )
 
     tool_name = getattr(request, "tool_name", "custom tool")

@@ -74,7 +74,7 @@ Add imports:
 
 ```typescript
 import { selectModel } from "./model-selector.js";
-import { episodeTool, latestEpisodesTool, getLatestEpisodes, pickEpisode } from "./merge-conflict-tools.js";
+import { episodeTool, latestEpisodesTool, getLatestEpisodes, pickEpisode } from "./github-podcast-tools.js";
 import { permissionPrompt } from "./permission-prompt.js";
 ```
 
@@ -93,11 +93,11 @@ const session = await client.createSession({
   model: selectedModel,
   streaming: true,
   tools: [episodeTool, latestEpisodesTool],
-  availableTools: ["get_merge_conflict_episode", "get_latest_merge_conflict_episodes"],
+  availableTools: ["get_github_podcast_episode", "get_latest_github_podcast_episodes"],
   onPermissionRequest: permissionPrompt,
   systemMessage: {
     mode: "replace",
-    content: "You are the launch assistant for the Merge Conflict podcast. Use supplied episode facts only.",
+    content: "You are the launch assistant for The GitHub Podcast. Use supplied episode facts only.",
   },
 });
 ```
@@ -105,7 +105,7 @@ const session = await client.createSession({
 Replace the prompt with:
 
 ```typescript
-prompt: `Use get_merge_conflict_episode for episode ${selectedEpisode.episodeNumber}. Return exactly a social headline and a sponsor-safe post under 280 characters. Use only facts returned by the tool; do not invent guests, sponsors, topics, or links.`,
+prompt: `Use get_github_podcast_episode for the episode titled "${selectedEpisode.title}". Return exactly a social headline and a sponsor-safe post under 280 characters. Use only facts returned by the tool; do not invent guests, sponsors, topics, or links.`,
 ```
 
 Expected cues: model list, episode list, tool start, approval prompt, tool completion, then streamed launch copy.

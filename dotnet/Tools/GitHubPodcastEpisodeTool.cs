@@ -6,18 +6,18 @@ using Microsoft.Extensions.AI;
 
 namespace CopilotSdkLiveDemo.Tools;
 
-internal static class MergeConflictEpisodeTool
+internal static class GitHubPodcastEpisodeTool
 {
-    private const string FeedUrl = "https://feeds.fireside.fm/mergeconflict/rss";
+    private const string FeedUrl = "https://feeds.simplecast.com/ioCY0vfY";
 
     internal static AIFunction CreateEpisodeTool() =>
         CopilotTool.DefineTool(
-            ([Description("Optional Merge Conflict episode number. Omit for the latest episode.")] int? episodeNumber) =>
-                GetAsync(episodeNumber),
+            ([Description("Optional GitHub Podcast episode title. Omit for the latest episode.")] string? episodeTitle) =>
+                GetAsync(episodeTitle),
             factoryOptions: new AIFunctionFactoryOptions
             {
-                Name = "get_merge_conflict_episode",
-                Description = "Gets a Merge Conflict episode from the official RSS feed."
+                Name = "get_github_podcast_episode",
+                Description = "Gets a GitHub Podcast episode from the official RSS feed."
             });
 
     internal static AIFunction CreateLatestEpisodesTool() =>
@@ -25,8 +25,8 @@ internal static class MergeConflictEpisodeTool
             () => GetLatestAsync(),
             factoryOptions: new AIFunctionFactoryOptions
             {
-                Name = "get_latest_merge_conflict_episodes",
-                Description = "Gets the ten newest Merge Conflict episodes from the official RSS feed."
+                Name = "get_latest_github_podcast_episodes",
+                Description = "Gets the ten newest GitHub Podcast episodes from the official RSS feed."
             });
 
     internal static async Task<IReadOnlyList<EpisodeBrief>> GetLatestAsync()
@@ -35,19 +35,20 @@ internal static class MergeConflictEpisodeTool
         return items.Take(10).Select(ToEpisodeBrief).ToList();
     }
 
-    private static async Task<EpisodeBrief> GetAsync(int? episodeNumber)
+    private static async Task<EpisodeBrief> GetAsync(string? episodeTitle)
     {
         var items = await GetItemsAsync();
 
-        var item = episodeNumber is null
+        var item = string.IsNullOrWhiteSpace(episodeTitle)
             ? items.FirstOrDefault()
-            : items.FirstOrDefault(candidate => GetEpisodeNumber(candidate) == episodeNumber);
+            : items.FirstOrDefault(candidate =>
+                string.Equals(Value(candidate, "title"), episodeTitle, StringComparison.OrdinalIgnoreCase));
 
         if (item is null)
         {
-            throw new InvalidOperationException(episodeNumber is null
-                ? "The Merge Conflict RSS feed contained no episodes."
-                : $"Episode {episodeNumber} was not found in the Merge Conflict RSS feed.");
+            throw new InvalidOperationException(string.IsNullOrWhiteSpace(episodeTitle)
+                ? "The GitHub Podcast RSS feed contained no episodes."
+                : $"Episode \"{episodeTitle}\" was not found in the GitHub Podcast RSS feed.");
         }
 
         return ToEpisodeBrief(item);

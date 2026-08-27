@@ -16,7 +16,7 @@ import (
 	copilot "github.com/github/copilot-sdk/go"
 )
 
-const feedURL = "https://feeds.fireside.fm/mergeconflict/rss"
+const feedURL = "https://feeds.simplecast.com/ioCY0vfY"
 
 type episodeBrief struct {
 	EpisodeNumber *int   `json:"episodeNumber"`
@@ -29,7 +29,7 @@ type episodeBrief struct {
 }
 
 type episodeParams struct {
-	EpisodeNumber *int `json:"episodeNumber" jsonschema:"Optional Merge Conflict episode number. Omit for the latest episode."`
+	EpisodeTitle string `json:"episodeTitle" jsonschema:"Optional GitHub Podcast episode title. Omit for the latest episode."`
 }
 
 type rssDocument struct {
@@ -46,18 +46,18 @@ type rssItem struct {
 
 func createEpisodeTool() copilot.Tool {
 	return copilot.DefineTool(
-		"get_merge_conflict_episode",
-		"Gets a Merge Conflict episode from the official RSS feed.",
+		"get_github_podcast_episode",
+		"Gets a GitHub Podcast episode from the official RSS feed.",
 		func(params episodeParams, _ copilot.ToolInvocation) (any, error) {
-			return getEpisode(params.EpisodeNumber)
+			return getEpisode(params.EpisodeTitle)
 		},
 	)
 }
 
 func createLatestEpisodesTool() copilot.Tool {
 	return copilot.DefineTool(
-		"get_latest_merge_conflict_episodes",
-		"Gets the ten newest Merge Conflict episodes from the official RSS feed.",
+		"get_latest_github_podcast_episodes",
+		"Gets the ten newest GitHub Podcast episodes from the official RSS feed.",
 		func(_ struct{}, _ copilot.ToolInvocation) (any, error) {
 			return getLatestEpisodes()
 		},
@@ -78,24 +78,24 @@ func getLatestEpisodes() ([]episodeBrief, error) {
 	return episodes, nil
 }
 
-func getEpisode(episodeNumber *int) (episodeBrief, error) {
+func getEpisode(episodeTitle string) (episodeBrief, error) {
 	items, err := getItems()
 	if err != nil {
 		return episodeBrief{}, err
 	}
-	if episodeNumber == nil {
+	if strings.TrimSpace(episodeTitle) == "" {
 		if len(items) == 0 {
-			return episodeBrief{}, fmt.Errorf("the Merge Conflict RSS feed contained no episodes")
+			return episodeBrief{}, fmt.Errorf("the GitHub Podcast RSS feed contained no episodes")
 		}
 		return toEpisodeBrief(items[0]), nil
 	}
 
 	for _, item := range items {
-		if number := getEpisodeNumber(item); number != nil && *number == *episodeNumber {
+		if strings.EqualFold(strings.TrimSpace(item.Title), strings.TrimSpace(episodeTitle)) {
 			return toEpisodeBrief(item), nil
 		}
 	}
-	return episodeBrief{}, fmt.Errorf("episode %d was not found in the Merge Conflict RSS feed", *episodeNumber)
+	return episodeBrief{}, fmt.Errorf("episode %q was not found in the GitHub Podcast RSS feed", episodeTitle)
 }
 
 func getItems() ([]rssItem, error) {
@@ -105,7 +105,7 @@ func getItems() ([]rssItem, error) {
 	}
 	defer response.Body.Close()
 	if response.StatusCode < 200 || response.StatusCode >= 300 {
-		return nil, fmt.Errorf("failed to fetch Merge Conflict RSS feed: %s", response.Status)
+		return nil, fmt.Errorf("failed to fetch The GitHub Podcast RSS feed: %s", response.Status)
 	}
 
 	var document rssDocument
@@ -167,10 +167,10 @@ func stripHTML(value string) string {
 
 func pickEpisode(episodes []episodeBrief) (episodeBrief, error) {
 	if len(episodes) == 0 {
-		return episodeBrief{}, fmt.Errorf("no Merge Conflict episodes are available to select")
+		return episodeBrief{}, fmt.Errorf("no GitHub Podcast episodes are available to select")
 	}
 
-	fmt.Println("\nChoose a Merge Conflict episode:")
+	fmt.Println("\nChoose a GitHub Podcast episode:")
 	for index, episode := range episodes {
 		fmt.Printf("  %d. %s\n", index+1, episode.Title)
 	}

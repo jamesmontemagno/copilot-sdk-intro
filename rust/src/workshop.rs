@@ -9,7 +9,7 @@ use quick_xml::de::from_str;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-const FEED_URL: &str = "https://feeds.fireside.fm/mergeconflict/rss";
+const FEED_URL: &str = "https://feeds.simplecast.com/ioCY0vfY";
 
 #[derive(Debug, Deserialize)]
 struct Rss {
@@ -46,8 +46,8 @@ pub struct EpisodeBrief {
 
 #[derive(Deserialize, JsonSchema)]
 struct EpisodeParams {
-    /// Optional Merge Conflict episode number. Omit for the latest episode.
-    episode_number: Option<i32>,
+    /// Optional GitHub Podcast episode title. Omit for the latest episode.
+    episode_title: Option<String>,
 }
 
 #[derive(Deserialize, JsonSchema)]
@@ -59,7 +59,7 @@ struct EpisodeTool;
 impl ToolHandler for EpisodeTool {
     async fn call(&self, invocation: ToolInvocation) -> Result<ToolResult, Error> {
         let params: EpisodeParams = serde_json::from_value(invocation.arguments)?;
-        let episode = get_episode(params.episode_number).await?;
+        let episode = get_episode(params.episode_title).await?;
         Ok(ToolResult::Text(serde_json::to_string(&episode)?))
     }
 }
@@ -75,15 +75,15 @@ impl ToolHandler for LatestEpisodesTool {
 }
 
 pub fn episode_tool() -> Tool {
-    Tool::new("get_merge_conflict_episode")
-        .with_description("Gets a Merge Conflict episode from the official RSS feed.")
+    Tool::new("get_github_podcast_episode")
+        .with_description("Gets a GitHub Podcast episode from the official RSS feed.")
         .with_parameters(schema_for::<EpisodeParams>())
         .with_handler(Arc::new(EpisodeTool))
 }
 
 pub fn latest_episodes_tool() -> Tool {
-    Tool::new("get_latest_merge_conflict_episodes")
-        .with_description("Gets the ten newest Merge Conflict episodes from the official RSS feed.")
+    Tool::new("get_latest_github_podcast_episodes")
+        .with_description("Gets the ten newest GitHub Podcast episodes from the official RSS feed.")
         .with_parameters(schema_for::<EmptyParams>())
         .with_handler(Arc::new(LatestEpisodesTool))
 }
@@ -93,24 +93,24 @@ pub async fn get_latest_episodes() -> Result<Vec<EpisodeBrief>, Error> {
     Ok(items.iter().take(10).map(to_episode_brief).collect())
 }
 
-pub async fn get_episode(episode_number: Option<i32>) -> Result<EpisodeBrief, Error> {
+pub async fn get_episode(episode_title: Option<String>) -> Result<EpisodeBrief, Error> {
     let items = get_items().await?;
-    let item = if let Some(number) = episode_number {
-        items.iter().find(|item| episode_number_from_title(item).is_some_and(|candidate| candidate == number))
+    let item = if let Some(title) = episode_title.filter(|title| !title.trim().is_empty()) {
+        items.iter().find(|item| item.title.as_deref().is_some_and(|candidate| candidate.eq_ignore_ascii_case(&title)))
     } else {
         items.first()
     };
 
     item.map(to_episode_brief)
-        .ok_or_else(|| std::io::Error::other("Episode was not found in the Merge Conflict RSS feed").into())
+        .ok_or_else(|| std::io::Error::other("Episode was not found in the GitHub Podcast RSS feed").into())
 }
 
 pub fn pick_episode(episodes: &[EpisodeBrief]) -> Result<EpisodeBrief, Box<dyn std::error::Error>> {
     if episodes.is_empty() {
-        return Err(std::io::Error::other("No Merge Conflict episodes are available to select.").into());
+        return Err(std::io::Error::other("No GitHub Podcast episodes are available to select.").into());
     }
 
-    println!("\nChoose a Merge Conflict episode:");
+    println!("\nChoose a GitHub Podcast episode:");
     for (index, episode) in episodes.iter().enumerate() {
         println!("  {}. {}", index + 1, episode.title);
     }

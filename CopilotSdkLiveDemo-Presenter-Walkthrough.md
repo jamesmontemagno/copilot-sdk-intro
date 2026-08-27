@@ -4,7 +4,7 @@ This is a standalone live-demo script for the `dotnet` sample in this repo, adap
 
 `https://github.com/jamesmontemagno/podcast-metadata-generator/tree/vslive-demo/samples/CopilotSdkLiveDemo`
 
-The walkthrough starts with a small streaming "hello world" and grows it into a grounded podcast assistant that uses typed .NET tools, user approval, and live RSS data from the Merge Conflict podcast.
+The walkthrough starts with a small streaming "hello world" and grows it into a grounded podcast assistant that uses typed .NET tools, user approval, and live RSS data from The GitHub Podcast.
 
 ## Demo Goal
 
@@ -157,7 +157,7 @@ Expected cue:
 
 Target time: 8-10 minutes.
 
-This act keeps the same session pattern but adds app-owned capabilities. The app fetches current episode data from the official Merge Conflict RSS feed and lets Copilot generate sponsor-safe launch copy from that data only.
+This act keeps the same session pattern but adds app-owned capabilities. The app fetches current episode data from the official GitHub Podcast RSS feed and lets Copilot generate sponsor-safe launch copy from that data only.
 
 ### Step 1: Add helper namespaces
 
@@ -178,9 +178,9 @@ After authentication succeeds and before creating the session, add:
 
 ```csharp
 var model = await ModelSelector.PickAsync(client, "gpt-5.4-mini");
-var latestEpisodes = await MergeConflictEpisodeTool.GetLatestAsync();
+var latestEpisodes = await GitHubPodcastEpisodeTool.GetLatestAsync();
 var selectedEpisode = EpisodeSelector.Pick(latestEpisodes);
-var selectedEpisodeNumber = selectedEpisode.EpisodeNumber;
+var selectedEpisodeTitle = selectedEpisode.Title;
 ```
 
 Then replace:
@@ -197,15 +197,15 @@ Console.WriteLine($"Using model: {model}\n");
 
 Say:
 
-> This keeps the demo live. I can choose a model in the room, then choose from the real ten newest Merge Conflict episodes.
+> This keeps the demo live. I can choose a model in the room, then choose from the real ten newest GitHub Podcast episodes.
 
 ### Step 3: Create the app-owned tools
 
 Before creating the session, add:
 
 ```csharp
-var episodeTool = MergeConflictEpisodeTool.CreateEpisodeTool();
-var latestEpisodesTool = MergeConflictEpisodeTool.CreateLatestEpisodesTool();
+var episodeTool = GitHubPodcastEpisodeTool.CreateEpisodeTool();
+var latestEpisodesTool = GitHubPodcastEpisodeTool.CreateLatestEpisodesTool();
 ```
 
 Say:
@@ -226,7 +226,7 @@ session = await client.CreateSessionAsync(new SessionConfig
     SystemMessage = new SystemMessageConfig
     {
         Mode = SystemMessageMode.Replace,
-        Content = "You are the launch assistant for the Merge Conflict podcast. Use supplied episode facts only."
+        Content = "You are the launch assistant for The GitHub Podcast. Use supplied episode facts only."
     }
 });
 ```
@@ -242,7 +242,7 @@ Replace the hello-world prompt with:
 ```csharp
 await session.SendAsync(new MessageOptions
 {
-    Prompt = $"Use get_merge_conflict_episode for episode {selectedEpisodeNumber}. Return exactly a social headline and a sponsor-safe post under 280 characters. Use only facts returned by the tool; do not invent guests, sponsors, topics, or links."
+    Prompt = $"Use get_github_podcast_episode for the episode titled \"{selectedEpisodeTitle}\". Return exactly a social headline and a sponsor-safe post under 280 characters. Use only facts returned by the tool; do not invent guests, sponsors, topics, or links."
 });
 ```
 
@@ -259,7 +259,7 @@ dotnet run --project dotnet
 Expected cues:
 
 1. The console lists available Copilot models.
-2. The console lists the ten newest Merge Conflict episodes.
+2. The console lists the ten newest GitHub Podcast episodes.
 3. The console prints `[Tool call started]`.
 4. The app asks whether to approve the tool.
 5. After approval, the console prints `[Tool call complete]`.
@@ -290,12 +290,12 @@ if (!isAuthenticated)
 }
 
 var model = await ModelSelector.PickAsync(client, Model);
-var latestEpisodes = await MergeConflictEpisodeTool.GetLatestAsync();
+var latestEpisodes = await GitHubPodcastEpisodeTool.GetLatestAsync();
 var selectedEpisode = EpisodeSelector.Pick(latestEpisodes);
-var selectedEpisodeNumber = selectedEpisode.EpisodeNumber;
+var selectedEpisodeTitle = selectedEpisode.Title;
 
-var episodeTool = MergeConflictEpisodeTool.CreateEpisodeTool();
-var latestEpisodesTool = MergeConflictEpisodeTool.CreateLatestEpisodesTool();
+var episodeTool = GitHubPodcastEpisodeTool.CreateEpisodeTool();
+var latestEpisodesTool = GitHubPodcastEpisodeTool.CreateLatestEpisodesTool();
 
 var complete = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 
@@ -308,7 +308,7 @@ var session = await client.CreateSessionAsync(new SessionConfig
     SystemMessage = new SystemMessageConfig
     {
         Mode = SystemMessageMode.Replace,
-        Content = "You are the launch assistant for the Merge Conflict podcast. Use supplied episode facts only."
+        Content = "You are the launch assistant for The GitHub Podcast. Use supplied episode facts only."
     }
 });
 
@@ -338,7 +338,7 @@ Console.WriteLine($"Using model: {model}\n");
 
 await session.SendAsync(new MessageOptions
 {
-    Prompt = $"Use get_merge_conflict_episode for episode {selectedEpisodeNumber}. Return exactly a social headline and a sponsor-safe post under 280 characters. Use only facts returned by the tool; do not invent guests, sponsors, topics, or links."
+    Prompt = $"Use get_github_podcast_episode for the episode titled \"{selectedEpisodeTitle}\". Return exactly a social headline and a sponsor-safe post under 280 characters. Use only facts returned by the tool; do not invent guests, sponsors, topics, or links."
 });
 
 await complete.Task;

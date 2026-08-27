@@ -11,25 +11,25 @@ import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class MergeConflictEpisodeTool {
-    private static final String FEED_URL = "https://feeds.fireside.fm/mergeconflict/rss";
+public final class GitHubPodcastEpisodeTool {
+    private static final String FEED_URL = "https://feeds.simplecast.com/ioCY0vfY";
 
-    private MergeConflictEpisodeTool() {
+    private GitHubPodcastEpisodeTool() {
     }
 
     public static ToolDefinition episodeTool() {
         return ToolDefinition.from(
-                "get_merge_conflict_episode",
-                "Gets a Merge Conflict episode from the official RSS feed.",
-                Param.of(Integer.class, "episodeNumber", "Optional Merge Conflict episode number. Omit for the latest episode."),
-                MergeConflictEpisodeTool::getEpisodeJson);
+                "get_github_podcast_episode",
+                "Gets a GitHub Podcast episode from the official RSS feed.",
+                Param.of(String.class, "episodeTitle", "Optional GitHub Podcast episode title. Omit for the latest episode."),
+                GitHubPodcastEpisodeTool::getEpisodeJson);
     }
 
     public static ToolDefinition latestEpisodesTool() {
         return ToolDefinition.from(
-                "get_latest_merge_conflict_episodes",
-                "Gets the ten newest Merge Conflict episodes from the official RSS feed.",
-                MergeConflictEpisodeTool::getLatestJson);
+                "get_latest_github_podcast_episodes",
+                "Gets the ten newest GitHub Podcast episodes from the official RSS feed.",
+                GitHubPodcastEpisodeTool::getLatestJson);
     }
 
     public static List<EpisodeBrief> latest() throws Exception {
@@ -43,10 +43,10 @@ public final class MergeConflictEpisodeTool {
 
     public static EpisodeBrief pick(List<EpisodeBrief> episodes) throws Exception {
         if (episodes.isEmpty()) {
-            throw new IllegalStateException("No Merge Conflict episodes are available to select.");
+            throw new IllegalStateException("No GitHub Podcast episodes are available to select.");
         }
 
-        System.out.println("\nChoose a Merge Conflict episode:");
+        System.out.println("\nChoose a GitHub Podcast episode:");
         for (int index = 0; index < episodes.size(); index++) {
             System.out.println("  " + (index + 1) + ". " + episodes.get(index).title());
         }
@@ -57,14 +57,14 @@ public final class MergeConflictEpisodeTool {
         return latest().toString();
     }
 
-    private static String getEpisodeJson(Integer episodeNumber) throws Exception {
+    private static String getEpisodeJson(String episodeTitle) throws Exception {
         for (var item : items()) {
             var episode = toEpisodeBrief(item);
-            if (episodeNumber == null || episodeNumber.equals(episode.episodeNumber())) {
+            if (episodeTitle == null || episodeTitle.isBlank() || episodeTitle.equalsIgnoreCase(episode.title())) {
                 return episode.toString();
             }
         }
-        throw new IllegalArgumentException("Episode " + episodeNumber + " was not found in the Merge Conflict RSS feed.");
+        throw new IllegalArgumentException("Episode \"" + episodeTitle + "\" was not found in the GitHub Podcast RSS feed.");
     }
 
     private static List<org.w3c.dom.Element> items() throws Exception {

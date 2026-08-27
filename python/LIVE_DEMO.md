@@ -56,10 +56,10 @@ await client.__aexit__(None, None, None)
 Add imports:
 
 ```python
-from merge_conflict_tools import (
+from github_podcast_tools import (
     get_latest,
-    get_latest_merge_conflict_episodes,
-    get_merge_conflict_episode,
+    get_latest_github_podcast_episodes,
+    get_github_podcast_episode,
     pick_episode,
 )
 from model_selector import select_model
@@ -80,12 +80,12 @@ Create the session with tools:
 session = await client.create_session(
     model=model,
     streaming=True,
-    tools=[get_merge_conflict_episode, get_latest_merge_conflict_episodes],
-    available_tools=["get_merge_conflict_episode", "get_latest_merge_conflict_episodes"],
+    tools=[get_github_podcast_episode, get_latest_github_podcast_episodes],
+    available_tools=["get_github_podcast_episode", "get_latest_github_podcast_episodes"],
     on_permission_request=permission_prompt,
     system_message={
         "mode": "replace",
-        "content": "You are the launch assistant for the Merge Conflict podcast. Use supplied episode facts only.",
+        "content": "You are the launch assistant for The GitHub Podcast. Use supplied episode facts only.",
     },
 )
 ```
@@ -94,7 +94,7 @@ Replace the prompt with:
 
 ```python
 await session.send(
-    f"Use get_merge_conflict_episode for episode {selected_episode.episode_number}. "
+    f"Use get_github_podcast_episode for the episode titled \"{selected_episode.title}\". "
     "Return exactly a social headline and a sponsor-safe post under 280 characters. "
     "Use only facts returned by the tool; do not invent guests, sponsors, topics, or links."
 )

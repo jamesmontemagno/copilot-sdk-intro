@@ -84,11 +84,11 @@ session, err := client.CreateSession(context.Background(), &copilot.SessionConfi
 	Model:               selectedModel,
 	Streaming:           copilot.Bool(true),
 	Tools:               []copilot.Tool{episodeTool, latestEpisodesTool},
-	AvailableTools:      []string{"get_merge_conflict_episode", "get_latest_merge_conflict_episodes"},
+	AvailableTools:      []string{"get_github_podcast_episode", "get_latest_github_podcast_episodes"},
 	OnPermissionRequest: copilot.PermissionHandler.ApproveAll,
 	SystemMessage: &copilot.SystemMessageConfig{
 		Mode:    "replace",
-		Content: "You are the launch assistant for the Merge Conflict podcast. Use supplied episode facts only.",
+		Content: "You are the launch assistant for The GitHub Podcast. Use supplied episode facts only.",
 	},
 })
 ```
@@ -96,7 +96,7 @@ session, err := client.CreateSession(context.Background(), &copilot.SessionConfi
 Replace the prompt:
 
 ```go
-prompt := fmt.Sprintf("Use get_merge_conflict_episode for episode %d. Return exactly a social headline and a sponsor-safe post under 280 characters. Use only facts returned by the tool; do not invent guests, sponsors, topics, or links.", *selectedEpisode.EpisodeNumber)
+prompt := fmt.Sprintf("Use get_github_podcast_episode for the episode titled %q. Return exactly a social headline and a sponsor-safe post under 280 characters. Use only facts returned by the tool; do not invent guests, sponsors, topics, or links.", selectedEpisode.Title)
 if err := streamResponse(session, prompt); err != nil {
 	panic(err)
 }

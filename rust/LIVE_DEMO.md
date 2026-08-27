@@ -64,8 +64,8 @@ config.model = selected_model;
 config.streaming = Some(true);
 config.tools = Some(vec![workshop::episode_tool(), workshop::latest_episodes_tool()]);
 config.available_tools = Some(vec![
-    "get_merge_conflict_episode".to_owned(),
-    "get_latest_merge_conflict_episodes".to_owned(),
+    "get_github_podcast_episode".to_owned(),
+    "get_latest_github_podcast_episodes".to_owned(),
 ]);
 let session = client.create_session(config).await?;
 ```
@@ -77,8 +77,8 @@ Replace the prompt:
 ```rust
 session
     .send(format!(
-        "Use get_merge_conflict_episode for episode {}. Return exactly a social headline and a sponsor-safe post under 280 characters. Use only facts returned by the tool; do not invent guests, sponsors, topics, or links.",
-        selected_episode.episode_number.unwrap_or_default()
+        "Use get_github_podcast_episode for the episode titled \"{}\". Return exactly a social headline and a sponsor-safe post under 280 characters. Use only facts returned by the tool; do not invent guests, sponsors, topics, or links.",
+        selected_episode.title
     ))
     .await?;
 ```

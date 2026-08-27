@@ -1,4 +1,4 @@
-# Merge Conflict Live Demo
+# The GitHub Podcast Live Demo
 
 ## Before The Session
 
@@ -73,20 +73,20 @@ Replace the fixed `Model` use with a picker, then load and select one of the ten
 
 ```csharp
 var model = await ModelSelector.PickAsync(client, "gpt-5.4-mini");
-var latestEpisodes = await MergeConflictEpisodeTool.GetLatestAsync();
+var latestEpisodes = await GitHubPodcastEpisodeTool.GetLatestAsync();
 var selectedEpisode = EpisodeSelector.Pick(latestEpisodes);
-var selectedEpisodeNumber = selectedEpisode.EpisodeNumber;
+var selectedEpisodeTitle = selectedEpisode.Title;
 ```
 
-Say: "This keeps the demo live. I can choose a model in the room, then choose from the real ten newest Merge Conflict episodes."
+Say: "This keeps the demo live. I can choose a model in the room, then choose from the real ten newest GitHub Podcast episodes."
 
 ### 2. Give The Session Capabilities
 
 Create the application-owned tools:
 
 ```csharp
-var episodeTool = MergeConflictEpisodeTool.CreateEpisodeTool();
-var latestEpisodesTool = MergeConflictEpisodeTool.CreateLatestEpisodesTool();
+var episodeTool = GitHubPodcastEpisodeTool.CreateEpisodeTool();
+var latestEpisodesTool = GitHubPodcastEpisodeTool.CreateLatestEpisodesTool();
 ```
 
 Extend `SessionConfig` with:
@@ -98,7 +98,7 @@ OnPermissionRequest = PermissionPrompt.RequestAsync,
 SystemMessage = new SystemMessageConfig
 {
     Mode = SystemMessageMode.Replace,
-    Content = "You are the launch assistant for the Merge Conflict podcast. Use supplied episode facts only."
+    Content = "You are the launch assistant for The GitHub Podcast. Use supplied episode facts only."
 }
 ```
 
@@ -111,7 +111,7 @@ Replace Hello World with the selected, grounded episode request:
 ```csharp
 await session.SendAsync(new MessageOptions
 {
-    Prompt = $"Use get_merge_conflict_episode for episode {selectedEpisodeNumber}. Return exactly a social headline and a sponsor-safe post under 280 characters. Use only facts returned by the tool; do not invent guests, sponsors, topics, or links."
+    Prompt = $"Use get_github_podcast_episode for the episode titled \"{selectedEpisodeTitle}\". Return exactly a social headline and a sponsor-safe post under 280 characters. Use only facts returned by the tool; do not invent guests, sponsors, topics, or links."
 });
 ```
 

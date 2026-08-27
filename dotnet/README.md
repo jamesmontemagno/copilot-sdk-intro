@@ -2,7 +2,7 @@
 
 A small .NET console demonstration that begins with a streaming GitHub Copilot SDK Hello World, then expands into typed application tools.
 
-The application fetches an episode from the official [Merge Conflict RSS feed](https://feeds.fireside.fm/mergeconflict/rss). Copilot receives structured source data and creates a concise, sponsor-safe social post without relying on invented episode facts.
+The application fetches an episode from the official [The GitHub Podcast RSS feed](https://feeds.simplecast.com/ioCY0vfY). Copilot receives structured source data and creates a concise, sponsor-safe social post without relying on invented episode facts.
 
 ## Run
 

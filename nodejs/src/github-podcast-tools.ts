@@ -1,7 +1,7 @@
 import { defineTool } from "@github/copilot-sdk";
 import { z } from "zod";
 
-const feedUrl = "https://feeds.fireside.fm/mergeconflict/rss";
+const feedUrl = "https://feeds.simplecast.com/ioCY0vfY";
 
 export type EpisodeBrief = {
   episodeNumber: number | null;
@@ -13,16 +13,16 @@ export type EpisodeBrief = {
   sourceFeedUrl: string;
 };
 
-export const episodeTool = defineTool("get_merge_conflict_episode", {
-  description: "Gets a Merge Conflict episode from the official RSS feed.",
+export const episodeTool = defineTool("get_github_podcast_episode", {
+  description: "Gets a GitHub Podcast episode from the official RSS feed.",
   parameters: z.object({
-    episodeNumber: z.number().int().optional().describe("Optional Merge Conflict episode number. Omit for the latest episode."),
+    episodeTitle: z.string().optional().describe("Optional GitHub Podcast episode title. Omit for the latest episode."),
   }),
-  handler: async ({ episodeNumber }) => getEpisode(episodeNumber),
+  handler: async ({ episodeTitle }) => getEpisode(episodeTitle),
 });
 
-export const latestEpisodesTool = defineTool("get_latest_merge_conflict_episodes", {
-  description: "Gets the ten newest Merge Conflict episodes from the official RSS feed.",
+export const latestEpisodesTool = defineTool("get_latest_github_podcast_episodes", {
+  description: "Gets the ten newest GitHub Podcast episodes from the official RSS feed.",
   parameters: z.object({}),
   handler: async () => getLatestEpisodes(),
 });
@@ -32,16 +32,16 @@ export async function getLatestEpisodes(): Promise<EpisodeBrief[]> {
   return items.slice(0, 10).map(toEpisodeBrief);
 }
 
-export async function getEpisode(episodeNumber?: number): Promise<EpisodeBrief> {
+export async function getEpisode(episodeTitle?: string): Promise<EpisodeBrief> {
   const items = await getItems();
-  const item = episodeNumber === undefined
+  const item = !episodeTitle
     ? items[0]
-    : items.find((candidate) => getEpisodeNumber(candidate) === episodeNumber);
+    : items.find((candidate) => value(candidate, "title").toLowerCase() === episodeTitle.toLowerCase());
 
   if (!item) {
-    throw new Error(episodeNumber === undefined
-      ? "The Merge Conflict RSS feed contained no episodes."
-      : `Episode ${episodeNumber} was not found in the Merge Conflict RSS feed.`);
+    throw new Error(!episodeTitle
+      ? "The GitHub Podcast RSS feed contained no episodes."
+      : `Episode "${episodeTitle}" was not found in the GitHub Podcast RSS feed.`);
   }
 
   return toEpisodeBrief(item);
@@ -49,10 +49,10 @@ export async function getEpisode(episodeNumber?: number): Promise<EpisodeBrief> 
 
 export async function pickEpisode(episodes: EpisodeBrief[]): Promise<EpisodeBrief> {
   if (episodes.length === 0) {
-    throw new Error("No Merge Conflict episodes are available to select.");
+    throw new Error("No GitHub Podcast episodes are available to select.");
   }
 
-  console.log("\nChoose a Merge Conflict episode:");
+  console.log("\nChoose a GitHub Podcast episode:");
   episodes.forEach((episode, index) => console.log(`  ${index + 1}. ${episode.title}`));
 
   const { readIndex } = await import("./model-selector.js");
@@ -62,7 +62,7 @@ export async function pickEpisode(episodes: EpisodeBrief[]): Promise<EpisodeBrie
 async function getItems(): Promise<string[]> {
   const response = await fetch(feedUrl);
   if (!response.ok) {
-    throw new Error(`Failed to fetch Merge Conflict RSS feed: ${response.status}`);
+    throw new Error(`Failed to fetch The GitHub Podcast RSS feed: ${response.status}`);
   }
 
   const xml = await response.text();

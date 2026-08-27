@@ -8,10 +8,10 @@ internal static class EpisodeSelector
     {
         if (episodes.Count == 0)
         {
-            throw new InvalidOperationException("No Merge Conflict episodes are available to select.");
+            throw new InvalidOperationException("No GitHub Podcast episodes are available to select.");
         }
 
-        Console.WriteLine("\nChoose a Merge Conflict episode:");
+        Console.WriteLine("\nChoose a GitHub Podcast episode:");
         for (var index = 0; index < episodes.Count; index++)
         {
             Console.WriteLine($"  {index + 1}. {episodes[index].Title}");

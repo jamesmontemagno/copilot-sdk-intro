@@ -6,7 +6,7 @@ export const permissionPrompt: PermissionHandler = async (request) => {
   if (request.kind !== "custom-tool") {
     return {
       kind: "reject",
-      feedback: "This demo only permits its Merge Conflict episode lookup tool.",
+      feedback: "This demo only permits its GitHub Podcast episode lookup tool.",
     };
   }
 

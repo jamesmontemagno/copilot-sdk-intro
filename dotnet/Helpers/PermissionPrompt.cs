@@ -13,7 +13,7 @@ internal static class PermissionPrompt
         if (request is not PermissionRequestCustomTool tool)
         {
             return Task.FromResult(PermissionDecision.Reject(
-                "This demo only permits its Merge Conflict episode lookup tool."));
+                "This demo only permits its GitHub Podcast episode lookup tool."));
         }
 
         Console.Write($"Approve {tool.ToolName}? [y/N] ");
