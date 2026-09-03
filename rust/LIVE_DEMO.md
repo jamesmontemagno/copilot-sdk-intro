@@ -54,10 +54,13 @@ Replace the session placeholder with:
 let mut config = SessionConfig::default();
 config.model = Some(MODEL.to_owned());
 config.streaming = Some(true);
+config.permission_handler = Some(github_copilot_sdk::permission::approve_all());
 let session = client.create_session(config).await?;
 ```
 
 Say: "The session is the conversation. I chose the model and enabled streaming."
+
+Say: "The handler is here even though Hello World has no tools: the runtime asks the application to decide on every permission request, and a session with no handler leaves them pending, so the run stalls instead of failing. Approve-all is the honest choice for an act with nothing to approve."
 
 ### 4. Send Hello World
 
@@ -125,6 +128,7 @@ config.available_tools = Some(vec![
     "get_github_podcast_episode".to_owned(),
     "get_latest_github_podcast_episodes".to_owned(),
 ]);
+config.permission_handler = Some(workshop::permission_prompt());
 config = config.with_system_message(
     SystemMessageConfig::new()
         .with_mode("replace")
@@ -135,7 +139,7 @@ config = config.with_system_message(
 let session = client.create_session(config).await?;
 ```
 
-Say: "The model gets two narrow, typed application capabilities. Add a `PermissionHandler` with `with_permission_handler` when the host must prompt for each tool call."
+Say: "The model does not get arbitrary access to my application. I grant two narrow, typed capabilities, allowlist them by name, and swap Hello World's approve-all handler for `workshop::permission_prompt`, which denies anything that is not one of these tools and asks me on stdin before one runs."
 
 Say: "These tools are what make this an agent rather than a generic chatbot: it can take action against a trusted data source that my application controls."
 
@@ -159,7 +163,7 @@ if let Some(event) = response {
 }
 ```
 
-Say: "The agent decides to call the episode tool, and its response is grounded in the official feed rather than invented details."
+Say: "The agent decides to call the episode tool, I approve the read-only lookup, and its response is grounded in the official feed rather than invented details."
 
 Run the completed Podcast Agent now from the `rust` folder:
 
@@ -167,4 +171,4 @@ Run the completed Podcast Agent now from the `rust` folder:
 cargo run
 ```
 
-Expected milestones: model selection, ten-episode selection, tool execution, then grounded launch copy.
+Expected milestones: model selection, ten-episode selection, tool execution, approval prompt, then grounded launch copy.

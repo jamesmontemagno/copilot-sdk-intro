@@ -29,7 +29,7 @@ mvn compile exec:java
 - Authentication status checks
 - Session configuration and events
 - Typed local tools
-- Explicit tool permission policy
+- Host-controlled tool approval
 - A replacement system message that defines the session's complete agent identity
 - Model and live episode selection
 - Responses grounded in current RSS data
