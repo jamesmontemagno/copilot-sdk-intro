@@ -48,11 +48,14 @@ At `CopilotSession session = null!;`, type:
 session = await client.CreateSessionAsync(new SessionConfig
 {
     Model = Model,
-    Streaming = true
+    Streaming = true,
+    OnPermissionRequest = PermissionHandler.ApproveAll
 });
 ```
 
 Say: "The session is the conversation. I chose the model, enabled streaming, and the event handler below already prints each text fragment as it arrives."
+
+Say: "The handler is here even though Hello World has no tools: the runtime asks the application to decide on every permission request, and a session with no handler leaves them pending, so the run stalls instead of failing. Approve-all is the honest choice for an act with nothing to approve."
 
 ### 4. Send Hello World
 
@@ -83,6 +86,13 @@ Say: "The conversation works. Now we will turn it into our Podcast Agent: a focu
 
 ### 1. Let The Presenter Choose
 
+Add usings for the prewritten helpers:
+
+```csharp
+using CopilotSdkLiveDemo.Helpers;
+using CopilotSdkLiveDemo.Tools;
+```
+
 Replace the fixed `Model` use with a picker, then load and select one of the ten newest episodes:
 
 ```csharp
@@ -108,6 +118,7 @@ Extend `SessionConfig` with:
 ```csharp
 Model = model,
 Tools = [episodeTool, latestEpisodesTool],
+AvailableTools = ["get_github_podcast_episode", "get_latest_github_podcast_episodes"],
 OnPermissionRequest = PermissionPrompt.RequestAsync,
 SystemMessage = new SystemMessageConfig
 {
@@ -116,7 +127,7 @@ SystemMessage = new SystemMessageConfig
 }
 ```
 
-Say: "The model does not get arbitrary access to my application. I grant two narrow, typed capabilities and remain the approval point before a tool executes."
+Say: "The model does not get arbitrary access to my application. I grant two narrow, typed capabilities, allowlist them by name, and swap Hello World's approve-all handler for one that prompts me, so I remain the approval point before a tool executes."
 
 Say: "These tools are what make this an agent rather than a generic chatbot: it can take action against a trusted data source that my application controls."
 

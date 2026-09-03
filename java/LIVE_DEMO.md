@@ -48,10 +48,15 @@ Replace the session placeholder with:
 ```java
 var session = client.createSession(new SessionConfig()
         .setModel(MODEL)
-        .setStreaming(true)).get();
+        .setStreaming(true)
+        .setOnPermissionRequest(PermissionHandler.APPROVE_ALL)).get();
 ```
 
+Add imports for `com.github.copilot.rpc.MessageOptions` and `com.github.copilot.rpc.PermissionHandler`.
+
 Say: "The session is the conversation. I chose the model and enabled streaming."
+
+Say: "The handler is here even though Hello World has no tools: the runtime asks the application to decide on every permission request, and a session with no handler leaves them pending, so the run stalls instead of failing. Approve-all is the honest choice for an act with nothing to approve."
 
 ### 4. Send Hello World
 
@@ -86,8 +91,8 @@ Say: "The conversation works. Now we will turn it into our Podcast Agent: a focu
 
 ### 1. Let The Presenter Choose
 
-Add imports for `com.github.copilot.rpc.MessageOptions`, `com.github.copilot.rpc.PermissionHandler`,
-`com.github.copilot.rpc.SystemMessageConfig`, `com.github.copilot.SystemMessageMode`, and `java.util.List`.
+Add imports for `com.github.copilot.rpc.SystemMessageConfig`, `com.github.copilot.SystemMessageMode`,
+and `java.util.List`. The `PermissionHandler` import is no longer used once `PermissionPrompt` replaces it below.
 
 After the client starts:
 
@@ -116,14 +121,14 @@ var session = client.createSession(new SessionConfig()
         .setStreaming(true)
         .setTools(List.of(episodeTool, latestEpisodesTool))
         .setAvailableTools(List.of("get_github_podcast_episode", "get_latest_github_podcast_episodes"))
-        .setOnPermissionRequest(PermissionHandler.APPROVE_ALL)
+        .setOnPermissionRequest(PermissionPrompt.HANDLER)
         .setSystemMessage(new SystemMessageConfig()
                 .setMode(SystemMessageMode.REPLACE)
                 .setContent("You are the launch assistant for The GitHub Podcast. Use supplied episode facts only.")))
         .get();
 ```
 
-Say: "The model gets two narrow, typed application capabilities. This Java sample uses the SDK's approve-all handler for those known local tools; replace it with a custom handler when the host must prompt for each call."
+Say: "The model does not get arbitrary access to my application. I grant two narrow, typed capabilities, allowlist them by name, and swap Hello World's approve-all handler for `PermissionPrompt`, which denies anything that is not one of these tools and asks me on stdin before one runs."
 
 Say: "These tools are what make this an agent rather than a generic chatbot: it can take action against a trusted data source that my application controls."
 
@@ -144,7 +149,7 @@ if (response != null) {
 }
 ```
 
-Say: "The agent decides to call the episode tool, and its response is grounded in the official feed rather than invented details."
+Say: "The agent decides to call the episode tool, I approve the read-only lookup, and its response is grounded in the official feed rather than invented details."
 
 Run the completed Podcast Agent now from the `java` folder:
 
@@ -152,4 +157,4 @@ Run the completed Podcast Agent now from the `java` folder:
 mvn compile exec:java
 ```
 
-Expected milestones: model selection, ten-episode selection, tool execution, then grounded launch copy.
+Expected milestones: model selection, ten-episode selection, tool execution, approval prompt, then grounded launch copy.

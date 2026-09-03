@@ -54,8 +54,9 @@ Replace the session placeholder with:
 
 ```go
 session, err := client.CreateSession(context.Background(), &copilot.SessionConfig{
-	Model:     preferredModel,
-	Streaming: copilot.Bool(true),
+	Model:               preferredModel,
+	Streaming:           copilot.Bool(true),
+	OnPermissionRequest: copilot.PermissionHandler.ApproveAll,
 })
 if err != nil {
 	panic(err)
@@ -64,6 +65,8 @@ defer session.Disconnect()
 ```
 
 Say: "The session is the conversation. I chose the model, enabled streaming, and the event handler below prints each text fragment as it arrives."
+
+Say: "The handler is here even though Hello World has no tools: the runtime asks the application to decide on every permission request, and a session with no handler leaves them pending, so the run stalls instead of failing. Approve-all is the honest choice for an act with nothing to approve."
 
 ### 4. Send Hello World
 
@@ -87,7 +90,7 @@ Expected output: a streamed one-sentence answer, followed by `SendAndWait` compl
 
 ## Act Two: Turn It Into A Podcast Agent
 
-After Hello World, use the prewritten helpers in `helpers.go` to turn the same session into a grounded podcast workflow.
+After Hello World, use the prewritten helpers in `helpers.go` and `permission_prompt.go` to turn the same session into a grounded podcast workflow.
 
 Say: "The conversation works. Now we will turn it into our Podcast Agent: a focused assistant that can research a selected GitHub Podcast episode and prepare launch copy without inventing facts."
 
@@ -129,7 +132,7 @@ session, err := client.CreateSession(context.Background(), &copilot.SessionConfi
 	Streaming:           copilot.Bool(true),
 	Tools:               []copilot.Tool{episodeTool, latestEpisodesTool},
 	AvailableTools:      []string{"get_github_podcast_episode", "get_latest_github_podcast_episodes"},
-	OnPermissionRequest: copilot.PermissionHandler.ApproveAll,
+	OnPermissionRequest: permissionPrompt,
 	SystemMessage: &copilot.SystemMessageConfig{
 		Mode:    "replace",
 		Content: "You are the launch assistant for The GitHub Podcast. Use supplied episode facts only.",
@@ -141,7 +144,7 @@ if err != nil {
 defer session.Disconnect()
 ```
 
-Say: "The model gets two narrow, typed application capabilities. This Go sample uses the SDK's approve-all handler for those known local tools; replace it with a custom handler when the host must prompt for each call."
+Say: "The model does not get arbitrary access to my application. I grant two narrow, typed capabilities, allowlist them by name, and swap Hello World's approve-all handler for `permissionPrompt` in `permission_prompt.go`, which denies anything that is not one of these tools and asks me on stdin before one runs."
 
 Say: "These tools are what make this an agent rather than a generic chatbot: it can take action against a trusted data source that my application controls."
 
@@ -158,7 +161,7 @@ if err := streamResponse(session, prompt); err != nil {
 }
 ```
 
-Say: "The agent decides to call the episode tool, and its response is grounded in the official feed rather than invented details."
+Say: "The agent decides to call the episode tool, I approve the read-only lookup, and its response is grounded in the official feed rather than invented details."
 
 Run the completed Podcast Agent now from the `go` folder:
 
@@ -166,4 +169,4 @@ Run the completed Podcast Agent now from the `go` folder:
 go run .
 ```
 
-Expected milestones: model selection, ten-episode selection, `[Tool call started]`, `[Tool call complete]`, then streamed launch copy.
+Expected milestones: model selection, ten-episode selection, `[Tool call started]`, approval prompt, `[Tool call complete]`, then streamed launch copy.

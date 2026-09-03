@@ -48,11 +48,23 @@ Say: "Before creating a session, I can ask the runtime whether this machine is s
 Replace `session = None` with:
 
 ```python
-session = await client.create_session(model=MODEL, streaming=True)
+session = await client.create_session(
+    model=MODEL,
+    streaming=True,
+    on_permission_request=PermissionHandler.approve_all,
+)
 await session.__aenter__()
 ```
 
+Widen the SDK import at the top of the file:
+
+```python
+from copilot import CopilotClient, PermissionHandler
+```
+
 Say: "The session is the conversation. I chose the model, enabled streaming, and the event handler below already prints each text fragment as it arrives."
+
+Say: "The handler is here even though Hello World has no tools: the runtime asks the application to decide on every permission request, and a session with no handler leaves them pending, so the run stalls instead of failing. Approve-all is the honest choice for an act with nothing to approve."
 
 ### 4. Send Hello World
 
@@ -102,6 +114,12 @@ from model_selector import select_model
 from permission_prompt import permission_prompt
 ```
 
+Narrow the SDK import back, since `permission_prompt` replaces `PermissionHandler` below:
+
+```python
+from copilot import CopilotClient
+```
+
 After the auth check:
 
 ```python
@@ -130,7 +148,7 @@ session = await client.create_session(
 )
 ```
 
-Say: "The model does not get arbitrary access to my application. I grant two narrow, typed capabilities and remain the approval point before a tool executes."
+Say: "The model does not get arbitrary access to my application. I grant two narrow, typed capabilities, allowlist them by name, and swap Hello World's approve-all handler for one that prompts me, so I remain the approval point before a tool executes."
 
 Say: "These tools are what make this an agent rather than a generic chatbot: it can take action against a trusted data source that my application controls."
 

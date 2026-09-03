@@ -2,8 +2,11 @@ use std::io::{self, Write};
 use std::sync::Arc;
 
 use async_trait::async_trait;
+use github_copilot_sdk::handler::{PermissionHandler, PermissionResult};
 use github_copilot_sdk::tool::{ToolHandler, schema_for};
-use github_copilot_sdk::types::{Tool, ToolInvocation};
+use github_copilot_sdk::types::{
+    PermissionRequestData, PermissionRequestKind, RequestId, SessionId, Tool, ToolInvocation,
+};
 use github_copilot_sdk::{Client, Error, ToolResult};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -71,6 +74,53 @@ pub fn latest_episodes_tool() -> Tool {
         .with_description("Gets the ten newest GitHub Podcast episodes from the official RSS feed.")
         .with_parameters(schema_for::<EmptyParams>())
         .with_handler(Arc::new(LatestEpisodesTool))
+}
+
+/// Keeps the presenter as the approval point. Anything that is not this demo's own
+/// local tool is denied, and a tool call must be approved on stdin.
+struct PermissionPrompt;
+
+#[async_trait]
+impl PermissionHandler for PermissionPrompt {
+    async fn handle(
+        &self,
+        _session_id: SessionId,
+        _request_id: RequestId,
+        data: PermissionRequestData,
+    ) -> PermissionResult {
+        if data.kind != Some(PermissionRequestKind::CustomTool) {
+            return PermissionResult::reject(
+                "This demo only permits its GitHub Podcast episode lookup tool.".to_owned(),
+            );
+        }
+
+        let tool_name = data
+            .extra
+            .get("toolName")
+            .and_then(|value| value.as_str())
+            .unwrap_or("custom tool")
+            .to_owned();
+
+        let answer = tokio::task::spawn_blocking(move || {
+            print!("Approve {tool_name}? [y/N] ");
+            let _ = io::stdout().flush();
+            let mut answer = String::new();
+            let _ = io::stdin().read_line(&mut answer);
+            answer
+        })
+        .await
+        .unwrap_or_default();
+
+        if answer.trim().eq_ignore_ascii_case("y") {
+            PermissionResult::approve_once()
+        } else {
+            PermissionResult::reject("The user did not approve the episode lookup.".to_owned())
+        }
+    }
+}
+
+pub fn permission_prompt() -> Arc<dyn PermissionHandler> {
+    Arc::new(PermissionPrompt)
 }
 
 pub async fn get_latest_episodes() -> Result<Vec<EpisodeBrief>, Error> {
