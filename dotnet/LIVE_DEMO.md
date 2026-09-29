@@ -96,7 +96,7 @@ using CopilotSdkLiveDemo.Tools;
 Replace the fixed `Model` use with a picker, then load and select one of the ten newest episodes:
 
 ```csharp
-var model = await ModelSelector.PickAsync(client, "gpt-5.4-mini");
+var model = await ModelSelector.PickAsync(client, "gpt-6-luna");
 var latestEpisodes = await GitHubPodcastEpisodeTool.GetLatestAsync();
 var selectedEpisode = EpisodeSelector.Pick(latestEpisodes);
 var selectedEpisodeTitle = selectedEpisode.Title;

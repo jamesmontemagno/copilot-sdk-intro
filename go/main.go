@@ -8,7 +8,7 @@ import (
 	copilot "github.com/github/copilot-sdk/go"
 )
 
-const preferredModel = "gpt-5.4-mini"
+const preferredModel = "gpt-6-luna"
 
 func main() {
 	fmt.Println("Copilot SDK hello world")

@@ -9,7 +9,7 @@ from copilot.session_events import (
     ToolExecutionStartData,
 )
 
-MODEL = "gpt-5.4-mini"
+MODEL = "gpt-6-luna"
 
 
 async def main() -> None:

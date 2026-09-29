@@ -4,7 +4,7 @@ import com.github.copilot.CopilotClient;
 import com.github.copilot.rpc.SessionConfig;
 
 public final class CopilotSdkLiveDemo {
-    private static final String MODEL = "gpt-5.4-mini";
+    private static final String MODEL = "gpt-6-luna";
 
     private CopilotSdkLiveDemo() {
     }

@@ -1,6 +1,6 @@
 import { CopilotClient, type CopilotSession } from "@github/copilot-sdk";
 
-const model = "gpt-5.4-mini";
+const model = "gpt-6-luna";
 
 console.log("Copilot SDK hello world\n");
 

@@ -1,6 +1,6 @@
 using GitHub.Copilot;
 
-const string Model = "gpt-5.4-mini";
+const string Model = "gpt-6-luna";
 
 Console.WriteLine("Copilot SDK hello world\n");
 

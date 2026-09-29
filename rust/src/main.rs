@@ -3,7 +3,7 @@ use std::io::{self, Write};
 use github_copilot_sdk::types::SessionConfig;
 use github_copilot_sdk::{Client, ClientOptions};
 
-const MODEL: &str = "gpt-5.4-mini";
+const MODEL: &str = "gpt-6-luna";
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
